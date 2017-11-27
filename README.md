@@ -15,10 +15,12 @@ it can list your pastes, add new ones and delete existing ones.
 
 ```pastebin setup```
 
-configuration file will be saved under $HOME/.pastebin
+configuration file will be saved under $HOME/.pastebin in JSON format.
+
 **Your password will not be saved to disk at any time.**
 The supplied password is just used once to login to pastebin.com and retrieve a valid _api_user_key_.
-The _api_user_key_ is saved to the config file along with the supplied username.
+
+The _api_user_key_ is saved to the config file along with the supplied username and the set default expiration time.
 
 After setup your account is used for all further actions.
 
