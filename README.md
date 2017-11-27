@@ -5,6 +5,8 @@ a pastebin commandline tool, can paste files onto pastebin.
 supports pastebin.com user accounts. when configured with credentials to pastebin.com
 it can list your pastes, add new ones and delete existing ones.
 
+[![GoDoc](https://godoc.org/github.com/scusi/pastebin?status.svg)](https://godoc.org/github.com/scusi/pastebin)
+
 ## Install
 
 ```go get github.com/scusi/pastebin```
