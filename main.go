@@ -93,37 +93,42 @@ func check(err error) {
 func main() {
 	var pc *client.Client
 	flag.Parse()
-	log.Printf("expire set to: %s\n", expire)
-
-	log.Printf("debug %t\n", debug)
 	if debug {
+		log.Printf("expire set to: %s\n", expire)
+		log.Printf("debug %t\n", debug)
 		client.Debug = true
 	}
 	action := flag.Arg(0)
-	log.Printf("action is: '%s'\n", action)
+	if debug {
+		log.Printf("action is: '%s'\n", action)
+	}
 	// if the anonymous flag is set we will always use a new (unconfigured) client.
 	if anonymous == true {
-		log.Printf("anonymous flag set (true)")
 		pc, err = client.New(
 			client.SetExpire(expire),
 		)
 		check(err)
-		log.Printf("Expire set to: %s\n", pc.Expire)
+		if debug {
+			log.Printf("anonymous flag set (true)")
+			log.Printf("Expire set to: %s\n", pc.Expire)
+		}
 		goto SWITCH
 	}
 
 	if _, err := os.Stat(clientFile); !os.IsNotExist(err) {
 		pc, err = client.RestoreClient(clientFile)
 		check(err)
-		//log.Printf("restored client from %s", clientFile)
-		pc.Update(client.SetExpire(expire))
+		if debug {
+			log.Printf("restored client from %s", clientFile)
+		}
 	} else {
 		err = fmt.Errorf("client not configured, please setup first if you want to paste with your user account")
 		log.Println(err)
 		//action = "setup"
-		pc, err = client.New()
+		pc, err = client.New(
+			client.SetExpire(expire),
+		)
 		check(err)
-		pc.Update(client.SetExpire(expire))
 	}
 SWITCH:
 	switch action {
@@ -154,6 +159,7 @@ SWITCH:
 		pc, err = client.New(
 			client.SetUsername(username),
 			client.SetPassword(password),
+			client.SetExpire(expire),
 		)
 		check(err)
 		sessionKey, err = pc.Login()
@@ -162,6 +168,8 @@ SWITCH:
 		// save the client
 		err := client.SaveClient(pc, clientFile)
 		check(err)
-		log.Printf("client saved under '%s'\n", clientFile)
+		if debug {
+			log.Printf("client saved under '%s'\n", clientFile)
+		}
 	}
 }
