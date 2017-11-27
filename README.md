@@ -24,6 +24,18 @@ After setup your account is used for all further actions.
 
 ## Usage
 
+```
+pastebin [-a -d -c /path/to/file -e expireValue] action arg
+
+-a anonymous flag, post as guest if true
+-d debug flag, output debug info if true
+-c file to read/write client configuration to
+-e expire value, can be 10M,1H,1D,1W,2W,1M,6M,1Y,N
+
+action can be: add, list, del
+arg us the filename to add or the code to delete
+```
+
 Paste a file 
 
 ```pastebin add test.txt```
@@ -37,15 +49,5 @@ You can also post as a guest after you have configured your client by useing the
 
 The above command would post as a guest, even when your client is confirued to use a user account.
 
-Other available options will be shown when useing the -h switch.
-```
-Usage of ./pastebin:
-  -a	anonymous flag, set to true for not useing a configured useraccount
-  -c string
-    	file to save client to (default "/home/analyzr/.pastebin")
-  -d	debug flag, set to true for debug output
-  -e string
-    	expireation for paste, default: 10M [10M,1H,1D,1W,2W,1M,6M,1Y,N] (default "10M")
-  -s string
-    	sessionkey to use
+sessionkey to use
 ```
