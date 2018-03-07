@@ -17,6 +17,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"strings"
 )
 
 const defaultUrl = "https://pastebin.com/api/"
@@ -46,6 +47,14 @@ var expireValues = map[string]string{
 
 var defaultExpire = "10M"
 
+var privateValues = map[string]string{
+	"0": "public",
+	"1": "unlisted",
+	"2": "private",
+}
+
+var defaultPrivateValue = "1"
+
 // Parameters type used to hold the POST parameters to send to the API
 type Parameters map[string]string
 
@@ -58,6 +67,7 @@ type Client struct {
 	Username   string      `json:"Username"`   // api_user_name to be used to login to the API
 	password   string      `json:"password"`   // api_user_password to be used to login to the API
 	Expire     string      `json:"expire"`     // default api_paste_expire_date for this client
+	Private    string      `json:"private"`
 }
 
 func init() {
@@ -127,6 +137,18 @@ func SetExpire(expire string) OptionFunc {
 			return nil
 		}
 		err = fmt.Errorf("expire value is not valid. Valid values are: %v\n", expireValues)
+		return err
+	}
+}
+
+func SetPrivate(private string) OptionFunc {
+	return func(c *Client) error {
+		_, ok := privateValues[private]
+		if ok {
+			c.Private = private
+			return nil
+		}
+		err = fmt.Errorf("given private value was not valid, can be: 0, 1, 2 (string)")
 		return err
 	}
 }
@@ -342,7 +364,7 @@ func (c *Client) NewPasteFromFile(filename string) (urlA string, err error) {
 		"api_paste_name":        filename,
 		"api_paste_code":        string(data),
 		"api_paste_expire_date": c.Expire,
-		"api_paste_private":     "1",
+		"api_paste_private":     c.Private,
 		//p["api_paste_format"]
 	}
 	//log.Printf("NewPasteFromFile: SessionKey: %+v", SessionKey)
@@ -368,14 +390,29 @@ func (c *Client) NewPasteFromFile(filename string) (urlA string, err error) {
 	// create body and options
 	resp, err := c.client.Do(req)
 	if err != nil {
+		if Debug == true {
+			log.Printf("error: %s\n", err.Error())
+		}
 		return urlA, err
+	}
+	if Debug {
+		log.Printf("resp status code: %v\n", resp.StatusCode)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return urlA, err
 	}
 	urlA = string(body)
+	if Debug {
+		log.Printf("urlA: %s\n", urlA)
+	}
 	// TODO: check if url starts with 'http'
+	if strings.Contains(urlA, "Bad API Request") {
+		err = fmt.Errorf("API Request Error: '%s'\n", urlA)
+		if strings.Contains(urlA, "invalid api_expire_date") {
+			err = fmt.Errorf("Your SesisonKey is not valid any more!, re do setup")
+		}
+	}
 	return urlA, err
 }
 

@@ -70,6 +70,7 @@ var expire string     // expire setting to be used for your posting
 var clientFile string // file where the pastebin settings are stored
 var anonymous bool    // if set to true a configured user account will NOT be used.
 var debug bool        // debug output enabled if true
+var private string
 
 func init() {
 	usr, err := user.Current()
@@ -78,6 +79,7 @@ func init() {
 	clientFile = homedir + "/" + ".pastebin"
 	flag.StringVar(&sessionKey, "s", "", "sessionkey to use")
 	flag.StringVar(&expire, "e", "10M", "expireation for paste, default: 10M [10M,1H,1D,1W,2W,1M,6M,1Y,N]")
+	flag.StringVar(&private, "p", "1", "paste exposure 0=public, 1=unlisted, 2=private")
 	flag.StringVar(&clientFile, "c", homedir+"/.pastebin", "file to save client to")
 	flag.BoolVar(&anonymous, "a", false, "anonymous flag, set to true for not useing a configured useraccount")
 	flag.BoolVar(&debug, "d", false, "debug flag, set to true for debug output")
@@ -86,6 +88,7 @@ func init() {
 // check generic error checker function
 func check(err error) {
 	if err != nil {
+		log.Printf("An Error occured:\n")
 		log.Fatal(err)
 	}
 }
@@ -131,6 +134,9 @@ func main() {
 		check(err)
 	}
 SWITCH:
+	if action == "add" && private != "1" {
+		pc.Update(client.SetPrivate(private))
+	}
 	switch action {
 	case "add":
 		file = flag.Arg(1)
@@ -160,6 +166,7 @@ SWITCH:
 			client.SetUsername(username),
 			client.SetPassword(password),
 			client.SetExpire(expire),
+			client.SetPrivate(private),
 		)
 		check(err)
 		sessionKey, err = pc.Login()
