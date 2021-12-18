@@ -72,6 +72,14 @@ var anonymous bool    // if set to true a configured user account will NOT be us
 var debug bool        // debug output enabled if true
 var private string
 
+var Usage = func() {
+	fmt.Fprintf(os.Stdout, "Usage of %s\n", os.Args[0])
+	fmt.Fprintf(os.Stdout, "Syntax: %s <flags> <action> <argument>\n\n", os.Args[0])
+	fmt.Fprintf(os.Stdout, "possible flags are:\n")
+	flag.PrintDefaults()
+	fmt.Fprintf(os.Stdout, "\npossible actions are: add, del, list, setup\n")
+}
+
 func init() {
 	usr, err := user.Current()
 	check(err)
@@ -83,6 +91,7 @@ func init() {
 	flag.StringVar(&clientFile, "c", homedir+"/.pastebin", "file to save client to")
 	flag.BoolVar(&anonymous, "a", false, "anonymous flag, set to true for not useing a configured useraccount")
 	flag.BoolVar(&debug, "d", false, "debug flag, set to true for debug output")
+	flag.Usage = Usage
 }
 
 // check generic error checker function
