@@ -116,15 +116,19 @@ func main() {
 	}
 
 	if _, err := os.Stat(clientFile); !os.IsNotExist(err) {
+		log.Printf("found saved client at: %s\n", clientFile)
 		pc, err = client.RestoreClient(clientFile)
 		check(err)
 		if debug {
 			log.Printf("restored client from %s", clientFile)
+			log.Printf("Expire set to: %s\n", pc.Expire)
 		}
+		pc.Expire = expire
+			log.Printf("Expire set to: %s\n", pc.Expire)
 	} else {
 		err = fmt.Errorf("client not configured, please setup first if you want to paste with your user account")
 		log.Println(err)
-		//action = "setup"
+		action = "setup"
 		pc, err = client.New(
 			client.SetExpire(expire),
 		)
@@ -147,7 +151,7 @@ SWITCH:
 		check(err)
 		fmt.Printf("%s\n", results)
 	case "setup":
-		if _, err := os.Stat(clientFile); !os.IsNotExist(err) {
+		//if _, err := os.Stat(clientFile); !os.IsNotExist(err) {
 			fmt.Print("Enter your pastebin username: ")
 			fmt.Scanf("%s", &username)
 			fmt.Printf("Enter password for the '%s'", username)
@@ -155,7 +159,7 @@ SWITCH:
 			check(err)
 			fmt.Println("")
 			password = string(bytePassword)
-		}
+		//}
 		pc, err = client.New(
 			client.SetUsername(username),
 			client.SetPassword(password),
@@ -166,7 +170,7 @@ SWITCH:
 		check(err)
 		password = "" // delete password from memory after login
 		// save the client
-		err := client.SaveClient(pc, clientFile)
+		err = client.SaveClient(pc, clientFile)
 		check(err)
 		if debug {
 			log.Printf("client saved under '%s'\n", clientFile)
