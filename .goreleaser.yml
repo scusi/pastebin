@@ -26,14 +26,14 @@ builds:
 archives:
   - id: common
     name_template: "{{.Os}}-{{.Arch}}-{{ .ProjectName }}"
-    format: tar.gz
+    formats: [ 'tar.gz' ]
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [ 'zip' ]
 checksum:
   name_template: 'checksums.txt'
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
   filters:
